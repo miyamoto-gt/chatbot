@@ -90,10 +90,9 @@
 
         removeThinkingMessage();
 
-        addMessage("bot", "エラーが発生しました。server.js が起動しているか確認してください。");
+        addMessage("bot", "今日の制限に達しました。明日また試してください。");
       }
 
-      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     // メッセージを画面に追加
@@ -115,8 +114,6 @@
       div.textContent = text;
 
       chatBox.appendChild(div);
-
-      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
 

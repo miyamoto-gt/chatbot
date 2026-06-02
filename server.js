@@ -8,24 +8,17 @@ import { fileURLToPath } from "url";
 
 dotenv.config();
 
-// ===============================
-// 基本設定
-// ===============================
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// JSONを受け取る設定
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// tamplateフォルダ内のHTML / CSS / JSなどを読み込む
 app.use(express.static(path.join(__dirname, "tamplate")));
 
-// ===============================
-// Gemini API
-// ===============================
+// Gemini APIキーの取得
 const apiKey = process.env.GEMINI_API_KEY;
 
 if (!apiKey) {
@@ -34,9 +27,7 @@ if (!apiKey) {
 
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
-// ===============================
-// history.json の設定
-// ===============================
+
 
 // dataフォルダを作成
 const dataDir = path.join(__dirname, "data");
@@ -81,9 +72,6 @@ function saveHistory(history) {
   );
 }
 
-// ===============================
-// 画面表示
-// ===============================
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "tamplate", "chat.html"));
 });
@@ -100,10 +88,6 @@ app.get("/health", (req, res) => {
   });
 });
 
-// ===============================
-// チャットAPI
-// chat.html → /chat → Gemini → history.json保存
-// ===============================
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
 
@@ -125,10 +109,10 @@ app.post("/chat", async (req, res) => {
     });
 
     const prompt = `
-あなたは機械学習を学ぶ大学生向けの学習支援チャットボットです。
+あなたは機械学習を学ぶ方に対しての学習支援チャットボットです。
 
 目的:
-機械学習の学習中に困ったことを、初学者にも分かるように説明すること。
+機械学習の勉強中に困ったことを、初学者にも分かるように説明すること。
 
 回答ルール:
 ・専門用語はできるだけ簡単に説明する
@@ -172,10 +156,6 @@ ${message}
   }
 });
 
-// ===============================
-// 履歴取得API
-// outline.htmlで会話履歴を表示する
-// ===============================
 app.get("/history", (req, res) => {
   const history = loadHistory();
 
@@ -184,10 +164,6 @@ app.get("/history", (req, res) => {
   });
 });
 
-// ===============================
-// 要約API
-// outline.html → /summary → history.json読み込み → Geminiで要約
-// ===============================
 app.get("/summary", async (req, res) => {
   if (!genAI) {
     return res.status(500).json({
@@ -256,21 +232,13 @@ ${JSON.stringify(recentHistory, null, 2)}
   }
 });
 
-// ===============================
-// 要約後に履歴削除
-// outline.htmlの削除ボタンから呼ぶ
-// ===============================
 app.post("/clear-history", (req, res) => {
   saveHistory([]);
 
   res.json({
     message: "学習履歴を削除しました。"
   });
-});
-
-// ===============================
-// サーバー起動
-// ===============================
+})
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
