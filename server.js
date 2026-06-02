@@ -1,4 +1,4 @@
-//ライブラリ
+// ライブラリ
 import express from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from "fs";
@@ -8,38 +8,53 @@ import { fileURLToPath } from "url";
 
 dotenv.config();
 
-
+// ===============================
 // 基本設定
+// ===============================
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = 5000;
 
 // JSONを受け取る設定
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// tamplateフォルダ内のCSSなどを読み込む
+// tamplateフォルダ内のHTML / CSS / JSなどを読み込む
 app.use(express.static(path.join(__dirname, "tamplate")));
 
+// ===============================
 // Gemini API
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+// ===============================
+const apiKey = process.env.GEMINI_API_KEY;
 
-// history.json の場所
-const historyPath = path.join(__dirname, "history.json");
-
-// APIキー確認
-if (!process.env.GEMINI_API_KEY) {
-  console.log("GEMINI_API_KEY が設定されていません。.envを確認してください。");
+if (!apiKey) {
+  console.log("GEMINI_API_KEY が設定されていません。RenderのEnvironment Variables または .env を確認してください。");
 }
 
-// history.json 読み込み
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
-function loadHistory() {
+// ===============================
+// history.json の設定
+// ===============================
+
+// dataフォルダを作成
+const dataDir = path.join(__dirname, "data");
+const historyPath = path.join(dataDir, "history.json");
+
+function ensureHistoryFile() {
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir);
+  }
+
   if (!fs.existsSync(historyPath)) {
     fs.writeFileSync(historyPath, "[]", "utf-8");
   }
+}
+
+// history.json 読み込み
+function loadHistory() {
+  ensureHistoryFile();
 
   try {
     const data = fs.readFileSync(historyPath, "utf-8");
@@ -49,7 +64,6 @@ function loadHistory() {
     }
 
     return JSON.parse(data);
-
   } catch (error) {
     console.log("history.json 読み込みエラー:", error);
     return [];
@@ -57,8 +71,9 @@ function loadHistory() {
 }
 
 // history.json 保存
-
 function saveHistory(history) {
+  ensureHistoryFile();
+
   fs.writeFileSync(
     historyPath,
     JSON.stringify(history, null, 2),
@@ -66,8 +81,9 @@ function saveHistory(history) {
   );
 }
 
-
+// ===============================
 // 画面表示
+// ===============================
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "tamplate", "chat.html"));
 });
@@ -76,14 +92,30 @@ app.get("/outline", (req, res) => {
   res.sendFile(path.join(__dirname, "tamplate", "outline.html"));
 });
 
+// 動作確認用
+app.get("/health", (req, res) => {
+  res.json({
+    status: "ok",
+    message: "server is running"
+  });
+});
+
+// ===============================
 // チャットAPI
 // chat.html → /chat → Gemini → history.json保存
+// ===============================
 app.post("/chat", async (req, res) => {
   const { message } = req.body;
 
   if (!message || message.trim() === "") {
     return res.json({
       reply: "質問内容が空です。機械学習で困っていることを入力してください。"
+    });
+  }
+
+  if (!genAI) {
+    return res.status(500).json({
+      reply: "APIキーが設定されていません。RenderのEnvironment Variables または .env を確認してください。"
     });
   }
 
@@ -104,6 +136,7 @@ app.post("/chat", async (req, res) => {
 ・長すぎず、理解しやすく答える
 ・質問者が自分で実装できるように、考え方も説明する
 ・活用例についても触れること
+
 質問:
 ${message}
 `;
@@ -111,9 +144,7 @@ ${message}
     const result = await model.generateContent(prompt);
     const reply = result.response.text() || "回答を生成できませんでした。";
 
-    // -------------------------------
     // 会話内容を history.json に保存
-    // -------------------------------
     const history = loadHistory();
 
     const record = {
@@ -126,7 +157,6 @@ ${message}
     };
 
     history.push(record);
-
     saveHistory(history);
 
     res.json({
@@ -134,16 +164,18 @@ ${message}
     });
 
   } catch (error) {
-    console.log(" チャットエラー:", error);
+    console.log("チャットエラー:", error);
 
-    res.json({
-      reply: "エラーが発生しました。.env のAPIキーや通信状態を確認してください。"
+    res.status(500).json({
+      reply: "エラーが発生しました。APIキーや通信状態を確認してください。"
     });
   }
 });
 
+// ===============================
 // 履歴取得API
 // outline.htmlで会話履歴を表示する
+// ===============================
 app.get("/history", (req, res) => {
   const history = loadHistory();
 
@@ -152,9 +184,17 @@ app.get("/history", (req, res) => {
   });
 });
 
+// ===============================
 // 要約API
 // outline.html → /summary → history.json読み込み → Geminiで要約
+// ===============================
 app.get("/summary", async (req, res) => {
+  if (!genAI) {
+    return res.status(500).json({
+      summary: "APIキーが設定されていません。RenderのEnvironment Variables または .env を確認してください。"
+    });
+  }
+
   try {
     const history = loadHistory();
 
@@ -208,18 +248,18 @@ ${JSON.stringify(recentHistory, null, 2)}
     });
 
   } catch (error) {
-    console.log(" 要約エラー:", error);
+    console.log("要約エラー:", error);
 
-    res.json({
+    res.status(500).json({
       summary: "要約中にエラーが発生しました。"
     });
   }
 });
 
-// -------------------------------
+// ===============================
 // 要約後に履歴削除
 // outline.htmlの削除ボタンから呼ぶ
-// -------------------------------
+// ===============================
 app.post("/clear-history", (req, res) => {
   saveHistory([]);
 
@@ -228,9 +268,11 @@ app.post("/clear-history", (req, res) => {
   });
 });
 
-// -------------------------------
+// ===============================
 // サーバー起動
-// -------------------------------
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(` Server running → http://localhost:${PORT}`);
+// ===============================
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
