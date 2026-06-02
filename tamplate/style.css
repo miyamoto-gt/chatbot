@@ -1,0 +1,183 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #f4f6f8;
+  font-family: Arial, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  color: #222;
+}
+
+.container {
+  width: min(900px, 92%);
+  margin: 0 auto;
+  padding: 32px 0;
+}
+
+.header {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.header h1 {
+  margin: 0 0 12px;
+  font-size: 28px;
+}
+
+.header p {
+  line-height: 1.7;
+  color: #555;
+}
+
+.link-button {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 10px 16px;
+  background: #2563eb;
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.chat-area {
+  height: 520px;
+  overflow-y: auto;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.message {
+  max-width: 80%;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.user-message {
+  margin-left: auto;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.bot-message {
+  margin-right: auto;
+  background: #eef2ff;
+  color: #222;
+}
+
+.input-area {
+  display: flex;
+  gap: 12px;
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+textarea {
+  flex: 1;
+  min-height: 70px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+button {
+  padding: 12px 18px;
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 12px;
+}
+
+button:hover,
+.link-button:hover {
+  opacity: 0.9;
+}
+
+.summary-section,
+.history-section {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.section-description {
+  color: #555;
+  line-height: 1.7;
+}
+
+.summary-box {
+  margin-top: 16px;
+  padding: 18px;
+  background: #f8fafc;
+  border-left: 5px solid #2563eb;
+  border-radius: 10px;
+  white-space: pre-wrap;
+  line-height: 1.8;
+}
+
+.danger-button {
+  background: #dc2626;
+}
+
+.history-item {
+  padding: 18px;
+  margin-bottom: 16px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.history-date {
+  font-size: 13px;
+  color: #666;
+}
+
+.answer-text {
+  white-space: pre-wrap;
+  line-height: 1.8;
+}
+
+@media (max-width: 600px) {
+  .header h1 {
+    font-size: 22px;
+  }
+
+  .chat-area {
+    height: 440px;
+  }
+
+  .input-area {
+    flex-direction: column;
+  }
+
+  .message {
+    max-width: 95%;
+  }
+
+  button,
+  .link-button {
+    width: 100%;
+    text-align: center;
+  }
+}

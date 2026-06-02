@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>学習まとめ</title>
+
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+  <div class="container">
+
+    <header class="header">
+      <h1>学習まとめ</h1>
+
+      <p>
+        チャットで会話した内容をJSONから読み込み、AIが学習内容として要約します。
+      </p>
+
+      <a href="/" class="link-button">チャットに戻る</a>
+    </header>
+
+    <section class="summary-section">
+      <h2>AIによる学習要約</h2>
+
+      <p class="section-description">
+        chat.htmlで保存された会話履歴をもとに、学習内容・理解できたこと・復習点をまとめます。
+      </p>
+
+      <button id="summaryBtn">学習内容を要約する</button>
+
+      <div id="summaryBox" class="summary-box">
+        ここに要約が表示されます。
+      </div>
+
+      <button id="clearBtn" class="danger-button">
+        要約後に履歴を削除
+      </button>
+    </section>
+
+    <section class="history-section">
+      <h2>保存された会話履歴</h2>
+
+      <div id="historyBox"></div>
+    </section>
+
+  </div>
+
+  <script>
+    
+    // 履歴読み込み
+    
+    async function loadHistory() {
+
+      const historyBox = document.getElementById("historyBox");
+
+      try {
+        const response = await fetch("/history");
+
+        if (!response.ok) {
+          throw new Error("API error");
+        }
+
+        const result = await response.json();
+
+        console.log(result);
+
+        historyBox.innerHTML = "";
+
+        if (result.history.length === 0) {
+          historyBox.innerHTML = "<p>まだ学習履歴がありません。</p>";
+          return;
+        }
+
+        result.history.slice().reverse().forEach(item => {
+
+          const div = document.createElement("div");
+
+          div.classList.add("history-item");
+
+          div.innerHTML = `
+            <p class="history-date">${escapeHtml(item.date)}</p>
+            <p><strong>テーマ:</strong> ${escapeHtml(item.topic)}</p>
+            <p><strong>質問:</strong> ${escapeHtml(item.question)}</p>
+            <p><strong>回答:</strong></p>
+          `;
+
+          historyBox.appendChild(div);
+        });
+
+      } catch (error) {
+        console.error(error);
+
+        historyBox.textContent = "履歴の取得に失敗しました。";
+      }
+    }
+
+    
+    // 要約作成
+    
+    async function createSummary() {
+
+      const summaryBox = document.getElementById("summaryBox");
+
+      summaryBox.textContent = "要約を作成中...";
+
+      try {
+        const response = await fetch("/summary");
+
+        if (!response.ok) {
+          throw new Error("API error");
+        }
+
+        const result = await response.json();
+
+        console.log(result);
+
+        summaryBox.textContent = result.summary;
+
+      } catch (error) {
+        console.error(error);
+
+        summaryBox.textContent = "要約の取得に失敗しました。";
+      }
+    }
+
+    // 要約後に履歴削除
+    
+    async function clearHistory() {
+
+      const ok = confirm("要約後の学習履歴を削除しますか？");
+
+      if (!ok) {
+        return;
+      }
+
+      const historyBox = document.getElementById("historyBox");
+      const summaryBox = document.getElementById("summaryBox");
+
+      try {
+        const response = await fetch("/clear-history", {
+          method: "POST"
+        });
+
+        if (!response.ok) {
+          throw new Error("API error");
+        }
+
+        const result = await response.json();
+
+        console.log(result);
+
+        historyBox.innerHTML = "<p>履歴を削除しました。</p>";
+
+        summaryBox.textContent =
+          summaryBox.textContent + "\n\n※ 要約後に会話履歴を削除しました。";
+
+      } catch (error) {
+        console.error(error);
+
+        alert("履歴の削除に失敗しました。");
+      }
+    }
+
+    
+    // HTMLエスケープ
+    
+    function escapeHtml(text) {
+
+      if (!text) {
+        return "";
+      }
+
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // ボタン処理
+
+    document.getElementById("summaryBtn").addEventListener("click", createSummary);
+
+    document.getElementById("clearBtn").addEventListener("click", clearHistory);
+
+    // ページ読み込み時に履歴表示
+    loadHistory();
+  </script>
+
+</body>
+</html>

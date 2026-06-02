@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>機械学習/勉強支援チャットボット</title>
+
+  <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+
+  <div class="container">
+
+    <header class="header">
+      <h1>機械学習勉強支援チャットボット</h1>
+
+      <p>
+        機械学習の勉強中に困ったことを質問できます。<br>
+        会話内容は一時的にJSONへ保存され、あとで学習まとめとして要約できます。
+      </p>
+
+      <a href="/outline" class="link-button">学習まとめを見る</a>
+    </header>
+
+    <main class="chat-area" id="chatBox">
+      <div class="message bot-message">
+        こんにちは。機械学習で困っていることを入力してください。<br>
+        例：混同行列の見方が分からない<br>
+        例：ロジスティック回帰と線形回帰の違いを教えて
+      </div>
+    </main>
+
+    <section class="input-area">
+      <textarea
+        id="messageInput"
+        placeholder="例：過学習とは何ですか？"
+      ></textarea>
+
+      <button id="sendBtn">送信</button>
+    </section>
+
+  </div>
+
+  <script>
+    // メッセージ送信
+  
+    async function sendMessage() {
+
+      const message = document.getElementById("messageInput").value.trim();
+
+      if (message === "") {
+        return;
+      }
+
+      const chatBox = document.getElementById("chatBox");
+
+      addMessage("user", message);
+
+      document.getElementById("messageInput").value = "";
+
+      addMessage("bot", "考え中...");
+
+      try {
+        const response = await fetch("/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: message
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error("API error");
+        }
+
+        const result = await response.json();
+
+        console.log(result);
+
+        removeThinkingMessage();
+
+        addMessage("bot", result.reply);
+
+      } catch (error) {
+        console.error(error);
+
+        removeThinkingMessage();
+
+        addMessage("bot", "エラーが発生しました。server.js が起動しているか確認してください。");
+      }
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // メッセージを画面に追加
+
+    function addMessage(type, text) {
+
+      const chatBox = document.getElementById("chatBox");
+
+      const div = document.createElement("div");
+
+      div.classList.add("message");
+
+      if (type === "user") {
+        div.classList.add("user-message");
+      } else {
+        div.classList.add("bot-message");
+      }
+
+      div.textContent = text;
+
+      chatBox.appendChild(div);
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+
+    function removeThinkingMessage() {
+
+      const messages = document.querySelectorAll(".bot-message");
+
+      const lastMessage = messages[messages.length - 1];
+
+      if (lastMessage && lastMessage.textContent === "考え中...") {
+        lastMessage.remove();
+      }
+    }
+
+
+    document.getElementById("sendBtn").addEventListener("click", sendMessage);
+
+
+    
+    document.getElementById("messageInput").addEventListener("keydown", function(event) {
+
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+
+    });
+  </script>
+
+</body>
+</html>
