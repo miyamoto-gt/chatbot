@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>機械学習/勉強支援チャットボット</title>
@@ -14,7 +15,7 @@
   <div class="container">
 
     <header class="header">
-      <h1>機械学習勉強支援チャットボット</h1>
+      <h1>機械学習用勉強支援チャットボット</h1>
 
       <p>
         機械学習の勉強中に困ったことを質問できます。<br>
@@ -26,16 +27,16 @@
 
     <main class="chat-area" id="chatBox">
       <div class="message bot-message">
-        こんにちは。機械学習で困っていることを入力してください。<br>
-        例：混同行列の見方が分からない<br>
-        例：ロジスティック回帰と線形回帰の違いを教えて
+        今日も勉強していきましょう！！<br>
+        例：LLMって何？<br>
+        例：回帰分析の種類ってどのくらいあるの？<br>
       </div>
     </main>
 
     <section class="input-area">
       <textarea
         id="messageInput"
-        placeholder="例：過学習とは何ですか？"
+        placeholder="例：機械学習とは何ですか？"
       ></textarea>
 
       <button id="sendBtn">送信</button>
@@ -44,7 +45,8 @@
   </div>
 
   <script>
-    // メッセージ送信
+    
+    // メッセージをサーバーに送信して返事をもらう
   
     async function sendMessage() {
 
@@ -130,8 +132,6 @@
 
 
     document.getElementById("sendBtn").addEventListener("click", sendMessage);
-
-
     
     document.getElementById("messageInput").addEventListener("keydown", function(event) {
 

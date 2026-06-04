@@ -16,13 +16,13 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, "tamplate")));
+app.use(express.static(path.join(__dirname, "template")));
 
 // Gemini APIキーの取得
 const apiKey = process.env.GEMINI_API_KEY;
 
 if (!apiKey) {
-  console.log("GEMINI_API_KEY が設定されていません。RenderのEnvironment Variables または .env を確認してください。");
+  console.log("GEMINI_API_KEYが設定されていません。");
 }
 
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
@@ -73,11 +73,11 @@ function saveHistory(history) {
 }
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "tamplate", "chat.html"));
+  res.sendFile(path.join(__dirname, "template", "chat.html"));
 });
 
 app.get("/outline", (req, res) => {
-  res.sendFile(path.join(__dirname, "tamplate", "outline.html"));
+  res.sendFile(path.join(__dirname, "template", "outline.html"));
 });
 
 // 動作確認用
@@ -99,7 +99,7 @@ app.post("/chat", async (req, res) => {
 
   if (!genAI) {
     return res.status(500).json({
-      reply: "APIキーが設定されていません。RenderのEnvironment Variables または .env を確認してください。"
+      reply: "APIキーが設定されていません。"
     });
   }
 
@@ -155,7 +155,7 @@ ${message}
     });
   }
 });
-
+// 履歴を取得
 app.get("/history", (req, res) => {
   const history = loadHistory();
 
@@ -167,7 +167,7 @@ app.get("/history", (req, res) => {
 app.get("/summary", async (req, res) => {
   if (!genAI) {
     return res.status(500).json({
-      summary: "APIキーが設定されていません。RenderのEnvironment Variables または .env を確認してください。"
+      summary: "APIキーが設定されていません。"
     });
   }
 
@@ -176,7 +176,7 @@ app.get("/summary", async (req, res) => {
 
     if (history.length === 0) {
       return res.json({
-        summary: "まだ学習履歴がありません。chat.htmlで機械学習について質問すると、ここに学習まとめが表示されます。"
+        summary: "まだ学習履歴がありません。チャットで機械学習について質問すると、ここに学習まとめが表示されます。"
       });
     }
 
@@ -184,7 +184,7 @@ app.get("/summary", async (req, res) => {
     const recentHistory = history.slice(-30);
 
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash-lite"
+      model: "gemini-2.5-flash"
     });
 
     const prompt = `

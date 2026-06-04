@@ -17,7 +17,7 @@
       <h1>学習まとめ</h1>
 
       <p>
-        チャットで会話した内容をJSONから読み込み、AIが学習内容として要約します。
+        チャットで会話した内容をAIが学習内容として要約します。
       </p>
 
       <a href="/" class="link-button">チャットに戻る</a>
@@ -27,7 +27,7 @@
       <h2>AIによる学習要約</h2>
 
       <p class="section-description">
-        chat.htmlで保存された会話履歴をもとに、学習内容・理解できたこと・復習点をまとめます。
+        チャットで保存された会話履歴をもとに、学習内容・理解できたこと・復習点をまとめます。
       </p>
 
       <button id="summaryBtn">学習内容を要約する</button>
@@ -85,7 +85,7 @@
             <p class="history-date">${escapeHtml(item.date)}</p>
             <p><strong>テーマ:</strong> ${escapeHtml(item.topic)}</p>
             <p><strong>質問:</strong> ${escapeHtml(item.question)}</p>
-            <p><strong>回答:</strong></p>
+            <p><strong>回答:</strong>${escapeHtml(item.answer)}</p>
           `;
 
           historyBox.appendChild(div);
@@ -131,9 +131,9 @@
     
     async function clearHistory() {
 
-      const ok = confirm("要約後の学習履歴を削除しますか？");
+      const shouldDelete = confirm("要約後の学習履歴を削除しますか？");
 
-      if (!ok) {
+      if (!shouldDelete) {
         return;
       }
 
@@ -155,8 +155,7 @@
 
         historyBox.innerHTML = "<p>履歴を削除しました。</p>";
 
-        summaryBox.textContent =
-          summaryBox.textContent + "\n\n※ 要約後に会話履歴を削除しました。";
+        summaryBox.textContent =summaryBox.textContent + "\n\n※ 要約後に会話履歴を削除しました。";
 
       } catch (error) {
         console.error(error);
