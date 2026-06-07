@@ -13,25 +13,25 @@
 
 ---
 
-##　WEBサイトの説明
+## WEBサイトの説明
+### webURL https://my-learning-chatbot.onrender.com
+
 <img src="https://github.com/user-attachments/assets/bbc1cfff-12cd-4df5-8dee-46815d5f4c34" alt="image" style="max-width: 100%; height: auto;">
-```text
-1.画面下部の入力欄に質問したい内容を入力します
-2.送信ボタンを押すと少し時間を置いた後に回答が出ます
-```
+
+### 1.画面下部の入力欄に質問したい内容を入力します
+### 2.送信ボタンを押すと少し時間を置いた後に回答が出ます
 <img src="https://github.com/user-attachments/assets/730b11cf-9f01-47a0-90e7-f6a5dedbf591" alt="image" style="max-width: 100%; height: auto;">
-```text
-3.学習内容を振り返りたい場合は、画面上部の「学習まとめを見る」ボタンを押します
-4.下の画像のように「学習内容を要約する」ボタンを押すと、これまでの学習内容を振り返るための要約を確認できます
-```
+
+### 3.学習内容を振り返りたい場合は、画面上部の「学習まとめを見る」ボタンを押します
+### 4.下の画像のように「学習内容を要約する」ボタンを押すと、これまでの学習内容を振り返るための要約を確認できます
 <img src="https://github.com/user-attachments/assets/ed0a6e29-9453-45af-a510-4210e0a63d41" alt="image" style="max-width: 100%; height: auto;">
-```text
-5.下の画像の「要約後に履歴を削除」を押すとこれまでの履歴をリセットできる
-```
+
+### 5.下の画像の「要約後に履歴を削除」を押すとこれまでの履歴をリセットできる
+
+
 <img src="https://github.com/user-attachments/assets/115062fd-92f2-4e2f-bfc2-689590e44e29" alt="image" style="max-width: 100%; height: auto;">
 
 ---
-
 ## 開発目的
 
 本プロジェクトの目的は、既存のAI APIを利用して、実際に動作するWebアプリケーションを開発することである。
@@ -39,7 +39,7 @@
 特に、以下の内容を理解することを目的とした。
 
 * JavaScriptによるフロントエンド処理
-* `fetch`、`async` / `await` を用いた非同期通信
+* fetch、async/awaitを用いた非同期通信
 * Node.js / Expressによるバックエンド処理
 * Gemini APIとの連携
 * JSONファイルを用いた会話履歴の保存
