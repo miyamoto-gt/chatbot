@@ -29,7 +29,6 @@
 
 
 ## WEBサイトの説明
-### webURL https://my-learning-chatbot.onrender.com
 
 <img src="https://github.com/user-attachments/assets/bbc1cfff-12cd-4df5-8dee-46815d5f4c34" alt="image" style="max-width: 100%; height: auto;">
 
